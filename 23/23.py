@@ -3,30 +3,22 @@ from collections import deque, Counter
 with open("inp.txt") as f:
     inp = f.read().splitlines()
 
-def move_north(elf):
-    global elves
-    x, y = elf
+def move_north(x,y):
     if set(((x-1, y-1), (x, y-1), (x+1, y-1))).intersection(elves):
         return False
     return (x, y-1)
 
-def move_south(elf):
-    global elves
-    x, y = elf
+def move_south(x,y):
     if set(((x-1, y+1), (x, y+1), (x+1, y+1))).intersection(elves):
         return False
     return (x, y+1)
 
-def move_west(elf):
-    global elves
-    x, y = elf
+def move_west(x,y):
     if set(((x-1, y-1), (x-1, y), (x-1, y+1))).intersection(elves):
         return False
     return (x-1, y)
 
-def move_east(elf):
-    global elves
-    x, y = elf
+def move_east(x,y):
     if set(((x+1, y-1), (x+1, y), (x+1, y+1))).intersection(elves):
         return False
     return (x+1, y)
@@ -44,14 +36,14 @@ moves = deque((move_north, move_south, move_west, move_east))
 round_count = 0
 while True:
     round_count += 1
-    # First half
+    ### First half
     proposed = {}
     for elf in elves:
         next_coords = False
         directions = 0
         for move in moves:
             # For each direction, check if there are any overlaps with current elf positions
-            new_coords = move(elf)
+            new_coords = move(*elf)
             if new_coords:
                 directions += 1
             # Only save the first possible move
@@ -62,7 +54,7 @@ while True:
         if 0 < directions < 4:
             proposed[elf] = next_coords
 
-    # Second half
+    ### Second half
     # Check for collisions
     to_remove = set()
     proposal_list = Counter(proposed.values())
@@ -74,7 +66,7 @@ while True:
     for k in to_remove:
         proposed.pop(k)
 
-    # Part 2 - No elf wants to move? We're done!
+    ### Part 2 - No elf wants to move? We're done!
     if len(proposed) == 0:
         print(f"Part 2: {round_count} rounds.")
         break
@@ -87,7 +79,7 @@ while True:
     # Shift move order
     moves.rotate(-1)
 
-    # Part 1 - End of round 10, how many empty tiles are there?
+    ### Part 1 - End of round 10, how many empty tiles are there?
     if round_count == 10:
         min_y = max_y = min_x = max_x = 0
         for x, y in elves:
